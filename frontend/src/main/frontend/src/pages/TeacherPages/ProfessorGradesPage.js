@@ -13,6 +13,7 @@ import NavigationContainerComponent from "../../components/NavigationComponents/
 import HeaderBar from "../../components/HeaderBar/HeaderBar";
 import bulkDownloadLogo from "../../assets/icons/navigation/default/Bulk Download.svg";
 import {useDispatch} from "react-redux";
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 Chart.register(LineElement);
 Chart.register(PointElement);
@@ -254,7 +255,7 @@ function ProfessorGradesPage() {
         setAssignmentName(assignmentName);
     }
 
-    const [studentGrade, setStudentGrade] = useState("");
+    const [studentGrade, setStudentGrade] = useState(0);
 
     const getStudentGrade = (studentGrade) => {
         setStudentGrade(studentGrade);
@@ -272,23 +273,24 @@ function ProfessorGradesPage() {
         setTeamName(teamName);
     }
 
-    const [newGrade, setNewGrade] = useState('');
+    const [newGrade, setNewGrade] = useState(0);
 
     const handleGradeEdit = (event) => {
         setNewGrade(event.target.value);
     }
 
     const editGrade = async (studentId, assignmentId,teamName, newGrade) => {
-        const url = `${process.env.REACT_APP_URL}/assignments/student/edit/${studentId}/${assignmentId}/${teamName}/teamSubmission/${newGrade}`;
+        const url = `${process.env.REACT_APP_URL}/assignments/student/edit/${assignmentId}/${teamName}/teamSubmission/blah/${newGrade}`;
         await axios
             .post(url)
             .then((res) => {
                 alert('Succesfully edited grade');
                 refreshPage();
                 console.log(res.data);
+                console.log(url);
             })
             .catch((e) => {
-                alert(e.message);
+                refreshPage();
             });
         }
 
@@ -311,6 +313,9 @@ function ProfessorGradesPage() {
             <div className='admin-container'>
                 <NavigationContainerComponent />
                 <div className='professor-user-roles'>
+                    <div className='grades-overview-breadcrumbs'>
+                        <Breadcrumbs></Breadcrumbs>
+                    </div>
                     <h2>Grades Overview for {course}</h2>
                     <div className='admin-tabs'>
                         <button className='user-roles-tab' onClick={() => changePage('roles')} style={{
@@ -328,10 +333,6 @@ function ProfessorGradesPage() {
                             color: page === "profanity" ? "white" : "black"
                         }}>Visual Stats
                         </button>
-                        <div classname ='csv-download-button-div'>
-                            <button classname ='csv-download-button' onClick={() => downloadCSV(userList)}>CSV Download </button>
-
-                        </div>
                     </div>
                     {page === "roles" && (
                         <>
@@ -367,10 +368,10 @@ function ProfessorGradesPage() {
                                             })}
                                         </select>
                                     </div>
+                                    <div className='professor-csv-download-button-div'>
+                                        <button className='csv-download-button' onClick={() => downloadCSV(userList)}>CSV Download</button>
+                                    </div>
                             </div>
-                            {/*<div className='csv-download-button-div'>*/}
-                            {/*    <button className='csv-download-button' onClick={() => downloadCSV(userStatsList)}>CSV Download</button>*/}
-                            {/*</div>*/}
 
                             <div>
                                 <div className='professor-user-list'>
@@ -378,7 +379,7 @@ function ProfessorGradesPage() {
                                         <div>Assignment</div>
                                         <div>Name</div>
                                         <div>Team</div>
-                                        <div>Grade</div>
+                                        <div>Grade (%)</div>
                                         <div>PRs Given To</div>
                                         <div>Submitted</div>
                                         <div>Actions</div>
@@ -394,7 +395,7 @@ function ProfessorGradesPage() {
                                                 <div>{convertDate(user._id.date)}</div>
                                                 <div>
                                                     <div className='grades-edit-container'>
-                                                        <button className='edit-button' onClick={() => {
+                                                        <button className='professor-grades-edit-button' onClick={() => {
                                                             setShowEditModal(true);
                                                             getEditUser(user.student_id);
                                                             getAssignmentName(user.assigment_name);
@@ -410,10 +411,10 @@ function ProfessorGradesPage() {
                                                                     <form>
                                                                         <div className='edit-grade-container'>
                                                                             <input className='edit-student-grade'
-                                                                                type="number"
+                                                                                type='number'
                                                                                 id="gradeEdit"
                                                                                 name="gradeEdit"
-                                                                                placeholder={studentGrade}
+                                                                                defaultValue={studentGrade}
                                                                                 onChange={handleGradeEdit} />
                                                                         </div>
                                                                     </form>
@@ -425,8 +426,8 @@ function ProfessorGradesPage() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className='delete-container'>
-                                                        <button className='delete-button' onClick={() => 
+                                                    <div className='professor-grades-delete-container'>
+                                                        <button className='professor-grades-delete-button' onClick={() => 
                                                             {getTeamName(user.team_name);
                                                             getAssignmentID(user.assignment_id);
                                                             downloadStudentAssignment(assignmentID, teamName) }}>
